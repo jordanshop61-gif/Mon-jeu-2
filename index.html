@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pour mon amoureuse 💋</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #c94f7c;
+    --rose-light: #f7dce8;
+    --rose-dark: #8a2f52;
+    --cream: #fdf6f0;
+    --dark: #1a0f14;
+    --text: #3d1f2d;
+    --muted: #9a7080;
+    --border: rgba(201,79,124,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(201,79,124,0.08) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 10% 90%, rgba(201,79,124,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+
+  /* INTRO */
+  .intro-wrap { text-align: center; max-width: 420px; }
+  .petal { font-size: 40px; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .intro-title { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; line-height: 1.15; color: var(--dark); margin-bottom: 0.5rem; }
+  .intro-title em { font-style: italic; color: var(--rose); }
+  .intro-sub { font-size: 14px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 2.5rem; }
+  .btn-start { background: var(--rose); color: white; border: none; border-radius: 99px; padding: 14px 40px; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+  .btn-start:hover { background: var(--rose-dark); transform: translateY(-1px); }
+  .admin-link { margin-top: 3rem; font-size: 12px; color: var(--muted); cursor: pointer; text-decoration: underline; opacity: 0.5; }
+  .admin-link:hover { opacity: 1; }
+
+  /* GAME */
+  .game-wrap { width: 100%; max-width: 500px; }
+  .progress-track { height: 3px; background: rgba(201,79,124,0.15); border-radius: 99px; margin-bottom: 2rem; }
+  .progress-fill { height: 100%; background: var(--rose); border-radius: 99px; transition: width 0.5s ease; }
+  .heat-pill { display: inline-block; font-size: 11px; letter-spacing: 0.1em; font-weight: 500; padding: 3px 12px; border-radius: 99px; margin-bottom: 14px; }
+  .h1 { background: rgba(201,79,124,0.1); color: var(--rose); }
+  .h2 { background: rgba(186,117,23,0.1); color: #9a6010; }
+  .h3 { background: rgba(162,45,45,0.12); color: #a32d2d; }
+  .hperso { background: rgba(83,74,183,0.1); color: #534AB7; }
+  .q-text { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; line-height: 1.4; color: var(--dark); margin-bottom: 1.5rem; }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 13px 18px; text-align: left; cursor: pointer; font-size: 14px; color: var(--text); font-family: 'Jost', sans-serif; transition: all 0.15s; }
+  .choice:hover { border-color: var(--rose); background: var(--rose-light); color: var(--rose-dark); }
+  .choice.sel { border-color: var(--rose); background: var(--rose-light); color: var(--rose-dark); font-weight: 500; }
+  .open-area { width: 100%; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: 'Cormorant Garamond', serif; color: var(--dark); resize: none; min-height: 90px; transition: border-color 0.15s; }
+  .open-area:focus { outline: none; border-color: var(--rose); }
+  .open-area::placeholder { color: var(--muted); font-style: italic; }
+  .game-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .btn-next { background: var(--rose); color: white; border: none; border-radius: 99px; padding: 11px 28px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.18s; }
+  .btn-next:hover:not(:disabled) { background: var(--rose-dark); }
+  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-skip { background: transparent; border: 1px solid var(--border); border-radius: 99px; padding: 10px 18px; font-size: 13px; color: var(--muted); cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.15s; }
+  .btn-skip:hover { border-color: var(--muted); }
+  .counter { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; }
+  .gage-reveal { margin-top: 12px; background: rgba(201,79,124,0.07); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--rose-dark); font-style: italic; display: none; }
+
+  /* DONE */
+  .done-wrap { text-align: center; max-width: 460px; width: 100%; }
+  .done-icon { font-size: 52px; margin-bottom: 1.2rem; }
+  .done-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: var(--dark); margin-bottom: 10px; }
+  .done-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .copy-box { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; text-align: left; }
+  .copy-box-title { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .copy-text { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--dark); line-height: 1.8; white-space: pre-wrap; }
+  .btn-copy { width: 100%; margin-top: 14px; background: var(--rose); color: white; border: none; border-radius: 99px; padding: 13px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  .btn-copy:hover { background: var(--rose-dark); }
+  .btn-copy.copied { background: #1D9E75; }
+  .copy-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+  /* ADMIN LOGIN */
+  .admin-wrap { text-align: center; max-width: 360px; width: 100%; }
+  .admin-wrap h2 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; margin-bottom: 6px; color: var(--dark); }
+  .admin-wrap p { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+  .pw-input { width: 100%; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 15px; font-family: 'Jost', sans-serif; color: var(--dark); text-align: center; letter-spacing: 0.1em; }
+  .pw-input:focus { outline: none; border-color: var(--rose); }
+  .pw-error { color: #c0392b; font-size: 13px; margin-top: 8px; display: none; }
+  .btn-login { width: 100%; margin-top: 12px; background: var(--rose); color: white; border: none; border-radius: 99px; padding: 13px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-login:hover { background: var(--rose-dark); }
+  .btn-back { margin-top: 14px; background: transparent; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; font-family: 'Jost', sans-serif; }
+
+  /* DASHBOARD */
+  .dash-wrap { width: 100%; max-width: 560px; padding-bottom: 3rem; }
+  .dash-header { text-align: center; margin-bottom: 2rem; }
+  .dash-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--dark); }
+  .dash-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .empty-state { text-align: center; background: white; border: 1px solid var(--border); border-radius: 14px; padding: 2.5rem; }
+  .empty-state p { color: var(--muted); font-size: 15px; }
+  .session-card { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; margin-bottom: 1rem; }
+  .session-meta { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 1rem; text-transform: uppercase; }
+  .qa-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(201,79,124,0.1); }
+  .qa-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .qa-q { font-size: 12px; color: var(--muted); margin-bottom: 5px; line-height: 1.4; }
+  .qa-a { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--rose-dark); font-style: italic; }
+  .btn-clear { margin-top: 1.5rem; background: transparent; border: 1px solid rgba(162,45,45,0.3); border-radius: 99px; padding: 9px 22px; font-size: 13px; color: #a32d2d; cursor: pointer; font-family: 'Jost', sans-serif; }
+  .btn-logout { margin-top: 10px; margin-left: 10px; background: transparent; border: 1px solid var(--border); border-radius: 99px; padding: 9px 22px; font-size: 13px; color: var(--muted); cursor: pointer; font-family: 'Jost', sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="s-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="petal">🌹</div>
+    <h1 class="intro-title">Pour mon<br><em>amoureuse</em></h1>
+    <p class="intro-sub">Un petit jeu rien que pour toi &amp; moi 💋</p>
+    <button class="btn-start" onclick="startGame()">Commencer ✨</button>
+    <div class="admin-link" onclick="showAdminLogin()">Voir les réponses</div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="s-game" class="screen">
+  <div class="game-wrap">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div id="q-area"></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-icon">💝</div>
+    <h2 class="done-title">Merci mon amour...</h2>
+    <p class="done-sub">Copie tes réponses et envoie-les lui sur WhatsApp 💌</p>
+    <div class="copy-box">
+      <div class="copy-box-title">Mes réponses 💋</div>
+      <div class="copy-text" id="copy-text"></div>
+    </div>
+    <button class="btn-copy" id="btn-copy" onclick="copyAnswers()">📋 Copier mes réponses</button>
+    <p class="copy-hint">Puis colle-les dans WhatsApp et envoie-les lui 😘</p>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="s-login" class="screen">
+  <div class="admin-wrap">
+    <h2>🔐 Espace privé</h2>
+    <p>Entre le mot de passe pour voir les réponses</p>
+    <input type="password" class="pw-input" id="pw-input" placeholder="Mot de passe..." onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="pw-error" id="pw-error">Mot de passe incorrect 🙅</div>
+    <button class="btn-login" onclick="checkPw()">Accéder</button><br>
+    <button class="btn-back" onclick="showScreen('s-intro')">← Retour</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="s-dash" class="screen">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <h2>💌 Ses réponses</h2>
+      <p>Voici ce qu'elle a confié...</p>
+    </div>
+    <div id="dash-content"></div>
+    <div style="text-align:center; margin-top:1rem;">
+      <button class="btn-clear" onclick="clearAnswers()">Effacer toutes les réponses</button>
+      <button class="btn-logout" onclick="showScreen('s-intro')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = "JordanL";
+const STORAGE_KEY = "amoureuse_reponses_v2";
+
+const questions = [
+  { heat:1, label:"🌶️ Chaud", type:"choix", text:"Quelle partie de mon corps t'obsède le plus ?", choices:["Tes mains — elles promettent tellement","Tes lèvres, sans hésiter","Tes yeux quand tu me regardes comme ça","Tout ton corps, de haut en bas"] },
+  { heat:1, label:"🌶️ Chaud", type:"choix", text:"Ce qui te rend folle de désir pour moi, c'est...", choices:["Ton parfum quand tu es tout près","La façon dont tu me touches","Ce sourire que tu n'as que pour moi","Quand tu prends les choses en main 😈"] },
+  { heat:2, label:"🌶️🌶️ Très chaud", type:"choix", text:"Où sur mon corps tu adorerais que j'embrasse en ce moment ?", choices:["Dans le cou, doucement","Sur les lèvres, longtemps","Dans le dos, en descendant...","À toi de deviner où j'ai envie 😏"] },
+  { heat:2, label:"🌶️🌶️ Très chaud", type:"choix", text:"Quelle position tu voudrais absolument qu'on essaie la prochaine fois ?", choices:["Quelque chose de tendre et fusionnel","Passionné(e) et intense, qu'on s'en souvienne","Aventurière — un endroit inhabituel","Je te laisse décider... et me surprendre 🔥"] },
+  { heat:2, label:"🌶️🌶️ Très chaud", type:"ouverte", text:"Qu'est-ce que j'ai fait la dernière fois qui t'a rendue folle ?" },
+  { heat:3, label:"🔥 Brûlant", type:"ouverte", text:"Ton fantasme inavoué que tu n'as jamais osé me dire... c'est quoi ?" },
+  { heat:3, label:"🔥 Brûlant", type:"choix", text:"Si tu pouvais me faire ce que tu veux pendant 1 heure sans retenue, tu commencerais par...", choices:["Un massage qui se transforme en autre chose 👐","M'allonger et prendre tout mon temps sur toi","Te déshabiller très, très lentement","Te regarder dans les yeux et te dire exactement ce que j'ai envie de faire"] },
+  { heat:3, label:"🔥 Brûlant", type:"ouverte", text:"Qu'est-ce que tu n'as encore jamais fait mais que tu mourrais d'envie d'essayer avec moi ?" },
+  { heat:2, label:"💫 Pour toi", type:"ouverte", text:"Décris-moi une soirée parfaite que tu pourrais avoir avec moi ?" },
+  { heat:3, label:"🔥 Brûlant", type:"choix", text:"Aimerais-tu essayer l'éjaculation féminine avec moi ?", choices:["Oui, j'en ai très envie 🔥","Oui, mais j'ai un peu peur","Je ne sais pas, on pourrait explorer ensemble ?","J'aimerais qu'on en parle d'abord 💬"] },
+  { heat:2, label:"🌶️🌶️ Très chaud", type:"choix", text:"Quelle partie du corps préfères-tu quand je te touche ?", choices:["Le clitoris 💗","Les fesses 🍑","La poitrine 💋","Les hanches 🌊"] }
+];
+
+const gages = [
+  "Envoie-lui un vocal en murmurant quelque chose que tu voudrais qu'il te fasse 🎤",
+  "Dis-lui en détail ce que tu portes en ce moment 😏",
+  "Décris-lui le dernier rêve coquin que tu as eu 🌙",
+  "Envoie-lui un emoji qui résume ce que tu as envie de faire là, maintenant 👀"
+];
+
+let cur = 0, answers = [], sel = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startGame() { cur = 0; answers = []; sel = null; showScreen('s-game'); renderQ(); }
+
+function renderQ() {
+  if (cur >= questions.length) { buildDoneScreen(); showScreen('s-done'); return; }
+  const q = questions[cur];
+  const pct = (cur / questions.length) * 100;
+  document.getElementById('prog').style.width = pct + '%';
+  const hClass = q.heat === 1 ? 'h1' : q.heat === 2 ? 'h2' : q.label.includes('💫') ? 'hperso' : 'h3';
+  const choicesHtml = q.type === 'choix'
+    ? `<div class="choices">${q.choices.map((c,i) => `<button class="choice" onclick="pick(this,${i})">${c}</button>`).join('')}</div>`
+    : `<textarea class="open-area" id="oa" placeholder="Sois honnête... c'est entre nous 🤫"></textarea>`;
+  document.getElementById('q-area').innerHTML = `
+    <span class="heat-pill ${hClass}">${q.label}</span>
+    <p class="q-text">${q.text}</p>
+    ${choicesHtml}
+    <div class="gage-reveal" id="gage"></div>
+    <div class="game-nav">
+      <button class="btn-skip" onclick="skip()">Passer (gage 😈)</button>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span class="counter">${cur+1} / ${questions.length}</span>
+        <button class="btn-next" id="btn-next" ${q.type==='choix'?'disabled':''} onclick="next()">
+          ${cur===questions.length-1?'Terminer ✨':'Suivant →'}
+        </button>
+      </div>
+    </div>`;
+  sel = null;
+}
+
+function pick(btn, i) {
+  document.querySelectorAll('.choice').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel'); sel = i;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function next() {
+  const q = questions[cur];
+  const ans = q.type === 'choix' ? q.choices[sel] : (document.getElementById('oa').value.trim() || '...');
+  answers.push({ q: q.text, a: ans });
+  sel = null; cur++; renderQ();
+}
+
+function skip() {
+  const g = gages[Math.floor(Math.random() * gages.length)];
+  const box = document.getElementById('gage');
+  box.style.display = 'block';
+  box.textContent = '💌 Ton gage : ' + g;
+  document.querySelector('.btn-skip').disabled = true;
+  setTimeout(() => {
+    answers.push({ q: questions[cur].text, a: '🎲 A passé (gage accepté !)' });
+    sel = null; cur++; renderQ();
+  }, 2800);
+}
+
+function buildDoneScreen() {
+  const lines = answers.map((a, i) => `${i+1}. ${a.q}\n➜ ${a.a}`).join('\n\n');
+  const full = `💋 Mes réponses à ton jeu :\n\n${lines}\n\n😘`;
+  document.getElementById('copy-text').textContent = full;
+  saveAnswers();
+}
+
+function copyAnswers() {
+  const text = document.getElementById('copy-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ Copié ! Colle ça dans WhatsApp 😘';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copier mes réponses'; btn.classList.remove('copied'); }, 3000);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(document.getElementById('copy-text'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copier mes réponses'; btn.classList.remove('copied'); }, 3000);
+  });
+}
+
+function saveAnswers() {
+  try {
+    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    existing.push({ date: new Date().toLocaleString('fr-FR'), answers });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+  } catch(e) {}
+}
+
+function showAdminLogin() {
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display = 'none';
+  showScreen('s-login');
+}
+
+function checkPw() {
+  if (document.getElementById('pw-input').value === PASSWORD) {
+    showScreen('s-dash'); renderDash();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+}
+
+function renderDash() {
+  const sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const el = document.getElementById('dash-content');
+  if (!sessions.length) {
+    el.innerHTML = '<div class="empty-state"><p>Aucune réponse pour l\'instant... Elle n\'a pas encore joué 🌹</p></div>';
+    return;
+  }
+  el.innerHTML = sessions.slice().reverse().map(s => `
+    <div class="session-card">
+      <div class="session-meta">Session du ${s.date}</div>
+      ${s.answers.map(a => `<div class="qa-item"><div class="qa-q">${a.q}</div><div class="qa-a">${a.a}</div></div>`).join('')}
+    </div>`).join('');
+}
+
+function clearAnswers() {
+  if (confirm('Effacer toutes les réponses sauvegardées ?')) {
+    localStorage.removeItem(STORAGE_KEY); renderDash();
+  }
+}
+</script>
+</body>
+</html>

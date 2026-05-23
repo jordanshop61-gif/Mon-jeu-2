@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jour 3 — Vérité ou Action 🎲</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E8672A;
+    --orange-light: #FDEEE6;
+    --orange-dark: #9A3E10;
+    --cream: #fdf8f5;
+    --dark: #1a0f0a;
+    --text: #3d2010;
+    --muted: #9a7060;
+    --border: rgba(232,103,42,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(232,103,42,0.08) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 10% 90%, rgba(232,103,42,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+
+  .intro-wrap { text-align: center; max-width: 420px; }
+  .petal { font-size: 40px; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .day-badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; font-weight: 500; padding: 4px 14px; border-radius: 99px; background: var(--orange-light); color: var(--orange-dark); margin-bottom: 1rem; text-transform: uppercase; }
+  .intro-title { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; line-height: 1.15; color: var(--dark); margin-bottom: 0.5rem; }
+  .intro-title em { font-style: italic; color: var(--orange); }
+  .intro-sub { font-size: 14px; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.7; }
+  .btn-start { background: var(--orange); color: white; border: none; border-radius: 99px; padding: 14px 40px; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+  .btn-start:hover { background: var(--orange-dark); }
+
+  .game-wrap { width: 100%; max-width: 500px; }
+  .progress-track { height: 3px; background: rgba(232,103,42,0.15); border-radius: 99px; margin-bottom: 2rem; }
+  .progress-fill { height: 100%; background: var(--orange); border-radius: 99px; transition: width 0.5s ease; }
+
+  .round-info { text-align: center; margin-bottom: 1.2rem; }
+  .round-info p { font-size: 13px; color: var(--muted); }
+
+  .type-selector { display: flex; gap: 12px; margin-bottom: 1.2rem; }
+  .type-btn { flex: 1; padding: 16px; border-radius: 14px; border: 1.5px solid var(--border); background: white; font-family: 'Jost', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .type-btn.verite { color: #3C3489; border-color: rgba(127,119,221,0.3); }
+  .type-btn.verite.active { background: #EEEDFE; border-color: #7F77DD; }
+  .type-btn.action { color: var(--orange-dark); border-color: var(--border); }
+  .type-btn.action.active { background: var(--orange-light); border-color: var(--orange); }
+
+  .card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+  .card-label { font-size: 11px; letter-spacing: 0.1em; font-weight: 500; text-transform: uppercase; margin-bottom: 12px; }
+  .card-label.v { color: #7F77DD; }
+  .card-label.a { color: var(--orange); }
+  .card-text { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; line-height: 1.4; color: var(--dark); }
+  .card-placeholder { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--muted); font-style: italic; text-align: center; }
+
+  .open-area { width: 100%; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: 'Cormorant Garamond', serif; color: var(--dark); resize: none; min-height: 80px; transition: border-color 0.15s; margin-top: 10px; }
+  .open-area:focus { outline: none; border-color: var(--orange); }
+  .open-area::placeholder { color: var(--muted); font-style: italic; }
+
+  .action-btns { display: flex; gap: 10px; margin-top: 1rem; }
+  .action-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.15s; background: white; }
+  .action-btn.yes { color: #1D9E75; border-color: rgba(29,158,117,0.3); }
+  .action-btn.yes.sel { background: #E1F5EE; border-color: #1D9E75; font-weight: 500; }
+  .action-btn.no { color: #a32d2d; border-color: rgba(163,45,45,0.3); }
+  .action-btn.no.sel { background: #FCEBEB; border-color: #a32d2d; font-weight: 500; }
+
+  .game-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .btn-next { background: var(--orange); color: white; border: none; border-radius: 99px; padding: 11px 28px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
+  .counter { font-size: 12px; color: var(--muted); }
+
+  .done-wrap { text-align: center; max-width: 460px; width: 100%; }
+  .done-icon { font-size: 52px; margin-bottom: 1.2rem; }
+  .done-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: var(--dark); margin-bottom: 10px; }
+  .done-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .copy-box { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; text-align: left; }
+  .copy-box-title { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .copy-text { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--dark); line-height: 1.8; white-space: pre-wrap; }
+  .btn-copy { width: 100%; margin-top: 14px; background: var(--orange); color: white; border: none; border-radius: 99px; padding: 13px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-copy.copied { background: #1D9E75; }
+  .copy-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div id="s-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="petal">🎲</div>
+    <span class="day-badge">Jour 3</span>
+    <h1 class="intro-title">Vérité<br><em>ou Action</em></h1>
+    <p class="intro-sub">Choisis entre répondre honnêtement<br>ou relever l'action... si tu oses 😈</p>
+    <button class="btn-start" onclick="startGame()">Je suis prête ✨</button>
+  </div>
+</div>
+
+<div id="s-game" class="screen">
+  <div class="game-wrap">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div id="q-area"></div>
+  </div>
+</div>
+
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-icon">🔥</div>
+    <h2 class="done-title">Bien joué !</h2>
+    <p class="done-sub">Envoie tes réponses sur WhatsApp 😘</p>
+    <div class="copy-box">
+      <div class="copy-box-title">Mes réponses 🎲</div>
+      <div class="copy-text" id="copy-text"></div>
+    </div>
+    <button class="btn-copy" id="btn-copy" onclick="copyAnswers()">📋 Copier mes réponses</button>
+    <p class="copy-hint">Puis colle-les dans WhatsApp et envoie-les lui 😘</p>
+  </div>
+</div>
+
+<script>
+// Questions fixes — dans l'ordre, alternées vérité/action
+const rounds = [
+  { type: 'verite', text: "Quelle partie de mon corps tu pourrais embrasser pendant des heures ?" },
+  { type: 'action', text: "Dis-moi en 3 mots comment tu veux que finisse notre prochaine soirée 🌙" },
+  { type: 'verite', text: "Si on avait une nuit entière sans aucune limite, tu commencerais par quoi ?" },
+  { type: 'action', text: "Envoie-moi une photo de ce que tu portes en ce moment 👀" },
+  { type: 'verite', text: "Quelle est la chose que tu n'as jamais osé me demander mais que tu veux vraiment ?" },
+  { type: 'action', text: "Dis-moi en détail ce que tu porterais pour me rendre fou 💋" },
+  { type: 'verite', text: "Quel est le moment où tu as eu le plus envie de moi depuis qu'on se connaît ?" },
+  { type: 'action', text: "Décris-moi en un mot comment tu te sens quand tu penses à moi 🌹" },
+  { type: 'verite', text: "C'est quoi ton fantasme le plus secret que tu n'as jamais réalisé ?" },
+  { type: 'action', text: "Oserais-tu le faire dehors avec moi ? Dis-moi où et comment... 😏" },
+];
+
+let cur = 0, answers = [], actionSel = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startGame() { cur = 0; answers = []; showScreen('s-game'); renderQ(); }
+
+function renderQ() {
+  if (cur >= rounds.length) { buildDone(); showScreen('s-done'); return; }
+  const r = rounds[cur];
+  const pct = (cur / rounds.length) * 100;
+  document.getElementById('prog').style.width = pct + '%';
+  actionSel = null;
+
+  const isVerite = r.type === 'verite';
+  const labelClass = isVerite ? 'v' : 'a';
+  const labelText = isVerite ? '💜 Vérité' : '🔥 Action';
+  const reponseHtml = isVerite
+    ? `<textarea class="open-area" id="oa" placeholder="Réponds honnêtement... 🤫"></textarea>`
+    : `<div class="action-btns">
+        <button class="action-btn yes" onclick="selAction(this,'✅ Action relevée !')">✅ Je le fais !</button>
+        <button class="action-btn no" onclick="selAction(this,'❌ Trop peur !')">❌ Trop peur !</button>
+       </div>`;
+
+  document.getElementById('q-area').innerHTML = `
+    <div class="round-info"><p>Tour ${cur+1} sur ${rounds.length}</p></div>
+    <div class="card">
+      <span class="card-label ${labelClass}">${labelText}</span>
+      <p class="card-text">${r.text}</p>
+    </div>
+    ${reponseHtml}
+    <div class="game-nav">
+      <span class="counter">${cur+1} / ${rounds.length}</span>
+      <button class="btn-next" id="btn-next" ${isVerite ? '' : 'disabled'} onclick="next()">
+        ${cur === rounds.length-1 ? 'Terminer ✨' : 'Suivant →'}
+      </button>
+    </div>`;
+}
+
+function selAction(btn, val) {
+  document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  actionSel = val;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function next() {
+  const r = rounds[cur];
+  let ans = r.type === 'verite'
+    ? (document.getElementById('oa').value.trim() || '...')
+    : actionSel;
+  answers.push({ type: r.type, q: r.text, a: ans });
+  cur++; renderQ();
+}
+
+function buildDone() {
+  const lines = answers.map((a,i) => `${i+1}. [${a.type==='verite'?'Vérité':'Action'}] ${a.q}\n➜ ${a.a}`).join('\n\n');
+  document.getElementById('copy-text').textContent = `🎲 Mes réponses — Jour 3 :\n\n${lines}\n\n😘`;
+}
+
+function copyAnswers() {
+  const text = document.getElementById('copy-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ Copié ! Colle ça dans WhatsApp 😘';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copier mes réponses'; btn.classList.remove('copied'); }, 3000);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(document.getElementById('copy-text'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copier mes réponses'; btn.classList.remove('copied'); }, 3000);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jour 9 — Mes vœux pour nous 💕</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --pink: #D4537E; --pink-light: #FBEAF0; --pink-dark: #72243E; --cream: #fdf6f8; --dark: #1a0a0f; --text: #3d1020; --muted: #9a7080; --border: rgba(212,83,126,0.2); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; }
+  body::before { content: ''; position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(212,83,126,0.07) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 10% 90%, rgba(212,83,126,0.05) 0%, transparent 70%); pointer-events: none; }
+  .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+  .intro-wrap { text-align: center; max-width: 420px; }
+  .petal { font-size: 40px; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
+  .day-badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; font-weight: 500; padding: 4px 14px; border-radius: 99px; background: var(--pink-light); color: var(--pink-dark); margin-bottom: 1rem; text-transform: uppercase; }
+  .intro-title { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; line-height: 1.15; color: var(--dark); margin-bottom: 0.5rem; }
+  .intro-title em { font-style: italic; color: var(--pink); }
+  .intro-sub { font-size: 14px; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.7; }
+  .btn-start { background: var(--pink); color: white; border: none; border-radius: 99px; padding: 14px 40px; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+  .btn-start:hover { background: var(--pink-dark); }
+  .game-wrap { width: 100%; max-width: 500px; }
+  .progress-track { height: 3px; background: rgba(212,83,126,0.15); border-radius: 99px; margin-bottom: 2rem; }
+  .progress-fill { height: 100%; background: var(--pink); border-radius: 99px; transition: width 0.5s ease; }
+  .card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card-label { font-size: 11px; letter-spacing: 0.1em; font-weight: 500; text-transform: uppercase; color: var(--pink); margin-bottom: 10px; }
+  .q-text { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; line-height: 1.4; color: var(--dark); }
+  .q-sub { font-size: 13px; color: var(--muted); font-style: italic; margin-top: 6px; }
+  .choices { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .choice { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 13px 18px; text-align: left; cursor: pointer; font-size: 14px; color: var(--text); font-family: 'Jost', sans-serif; transition: all 0.15s; }
+  .choice:hover { border-color: var(--pink); background: var(--pink-light); color: var(--pink-dark); }
+  .choice.sel { border-color: var(--pink); background: var(--pink-light); color: var(--pink-dark); font-weight: 500; }
+  .open-area { width: 100%; background: var(--cream); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: 'Cormorant Garamond', serif; color: var(--dark); resize: none; min-height: 90px; transition: border-color 0.15s; margin-top: 12px; }
+  .open-area:focus { outline: none; border-color: var(--pink); }
+  .open-area::placeholder { color: var(--muted); font-style: italic; }
+  .game-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .btn-next { background: var(--pink); color: white; border: none; border-radius: 99px; padding: 11px 28px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
+  .counter { font-size: 12px; color: var(--muted); }
+  .done-wrap { text-align: center; max-width: 460px; width: 100%; }
+  .done-icon { font-size: 52px; margin-bottom: 1.2rem; }
+  .done-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: var(--dark); margin-bottom: 10px; }
+  .done-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .copy-box { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; text-align: left; }
+  .copy-box-title { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .copy-text { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--dark); line-height: 1.8; white-space: pre-wrap; }
+  .btn-copy { width: 100%; margin-top: 14px; background: var(--pink); color: white; border: none; border-radius: 99px; padding: 13px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-copy.copied { background: #1D9E75; }
+  .copy-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div id="s-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="petal">💫</div>
+    <span class="day-badge">Jour 9</span>
+    <h1 class="intro-title">Mes vœux<br><em>pour nous</em></h1>
+    <p class="intro-sub">10 souhaits pour notre avenir...<br>Écris depuis le fond du cœur 💕</p>
+    <button class="btn-start" onclick="startGame()">Commencer ✨</button>
+  </div>
+</div>
+
+<div id="s-game" class="screen">
+  <div class="game-wrap">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div id="q-area"></div>
+  </div>
+</div>
+
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-icon">💕</div>
+    <h2 class="done-title">Ces vœux sont magnifiques...</h2>
+    <p class="done-sub">Envoie-les lui sur WhatsApp 😘</p>
+    <div class="copy-box">
+      <div class="copy-box-title">Mes vœux 💫</div>
+      <div class="copy-text" id="copy-text"></div>
+    </div>
+    <button class="btn-copy" id="btn-copy" onclick="copyAnswers()">📋 Copier mes vœux</button>
+    <p class="copy-hint">Puis colle dans WhatsApp et envoie-lui 😘</p>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { label:"Vœu 1 💕", type:"ouverte", text:"Mon premier souhait pour nous c'est...", sub:"Commence par ce qui te tient le plus à cœur" },
+  { label:"Vœu 2 🌙", type:"choix", text:"Dans 1 an, je nous vois...", choices:["Encore plus amoureux l'un de l'autre","Avoir fait un grand voyage ensemble","Avoir franchi une nouvelle étape","Exactement pareils, en mieux"] },
+  { label:"Vœu 3 🌹", type:"ouverte", text:"Je voudrais qu'on prenne plus le temps de...", sub:"Quelque chose qu'on ne fait pas assez" },
+  { label:"Vœu 4 ✨", type:"choix", text:"Mon vœu le plus romantique pour nous c'est...", choices:["Qu'on ne se lasse jamais l'un de l'autre","Qu'on rit ensemble jusqu'à la fin","Qu'on se surprenne encore dans 10 ans","Qu'on construise quelque chose de grand"] },
+  { label:"Vœu 5 💫", type:"ouverte", text:"Je souhaite qu'on ne perde jamais...", sub:"Qu'est-ce qui est précieux dans notre relation ?" },
+  { label:"Vœu 6 🌟", type:"choix", text:"Pour notre avenir, ce qui compte le plus c'est...", choices:["La complicité et le rire","La passion et l'intimité","La confiance et la fidélité","Tout ça à la fois 💕"] },
+  { label:"Vœu 7 🗺️", type:"ouverte", text:"Un endroit où je rêve qu'on aille ensemble un jour...", sub:"Un rêve, même lointain" },
+  { label:"Vœu 8 🔮", type:"choix", text:"Dans 10 ans, je veux qu'on puisse dire...", choices:["On a vécu une belle aventure ensemble","On s'aime encore comme au premier jour","On a construit quelque chose de solide","On a tout donné l'un pour l'autre"] },
+  { label:"Vœu 9 💌", type:"ouverte", text:"La promesse que je voudrais te faire aujourd'hui c'est...", sub:"Du fond du cœur" },
+  { label:"Vœu 10 💝", type:"ouverte", text:"Mon vœu le plus profond pour nous c'est...", sub:"Termine en beauté" },
+];
+
+let cur=0, answers=[], sel=null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startGame() { cur=0; answers=[]; sel=null; showScreen('s-game'); renderQ(); }
+
+function renderQ() {
+  if(cur>=questions.length){ buildDone(); showScreen('s-done'); return; }
+  const q=questions[cur], pct=(cur/questions.length)*100;
+  document.getElementById('prog').style.width=pct+'%';
+  sel=null;
+  const reponseHtml=q.type==='choix'
+    ?`<div class="choices">${q.choices.map((c,i)=>`<button class="choice" onclick="pick(this,${i})">${c}</button>`).join('')}</div>`
+    :`<textarea class="open-area" id="oa" placeholder="Ecris librement, depuis le coeur..."></textarea>`;
+  document.getElementById('q-area').innerHTML=`
+    <div class="card">
+      <div class="card-label">${q.label}</div>
+      <p class="q-text">${q.text}</p>
+      ${q.sub?`<p class="q-sub">${q.sub}</p>`:''}
+      ${reponseHtml}
+    </div>
+    <div class="game-nav">
+      <span class="counter">${cur+1} / ${questions.length}</span>
+      <button class="btn-next" id="btn-next" ${q.type==='choix'?'disabled':''} onclick="next()">
+        ${cur===questions.length-1?'Terminer ✨':'Suivant →'}
+      </button>
+    </div>`;
+}
+
+function pick(btn,i) {
+  document.querySelectorAll('.choice').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); sel=i;
+  document.getElementById('btn-next').disabled=false;
+}
+
+function next() {
+  const q=questions[cur];
+  const ans=q.type==='choix'?q.choices[sel]:(document.getElementById('oa').value.trim()||'...');
+  answers.push({q:q.text, a:ans});
+  sel=null; cur++; renderQ();
+}
+
+function buildDone() {
+  const lines=answers.map((a,i)=>`${i+1}. ${a.q}\n➜ ${a.a}`).join('\n\n');
+  document.getElementById('copy-text').textContent=`💫 Mes voeux — Jour 9 :\n\n${lines}\n\n😘`;
+}
+
+function copyAnswers() {
+  const text=document.getElementById('copy-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('btn-copy');
+    btn.textContent='✅ Copié ! Colle ça dans WhatsApp 😘';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copier mes vœux';btn.classList.remove('copied');},3000);
+  }).catch(()=>{
+    const range=document.createRange();
+    range.selectNode(document.getElementById('copy-text'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    const btn=document.getElementById('btn-copy');
+    btn.textContent='✅ Copié !';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copier mes vœux';btn.classList.remove('copied');},3000);
+  });
+}
+</script>
+</body>
+</html>

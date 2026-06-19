@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jour 10 — Le Grand Final 🔥</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --dark-bg: #0d0008; --card-bg: #1a0012; --accent: #c94f7c; --accent-light: #f7dce8; --accent-dark: #8a2f52; --gold: #BA7517; --gold-light: #FAEEDA; --text: #f5e6ef; --muted: #a07090; --border: rgba(201,79,124,0.25); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: var(--dark-bg); color: var(--text); font-family: 'Jost', sans-serif; }
+  body::before { content: ''; position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse 50% 50% at 50% 0%, rgba(201,79,124,0.15) 0%, transparent 60%); pointer-events: none; }
+  .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+  .intro-wrap { text-align: center; max-width: 420px; }
+  .petal { font-size: 48px; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);} }
+  .intro-title { font-family: 'Cormorant Garamond', serif; font-size: 46px; font-weight: 300; line-height: 1.1; color: white; margin-bottom: 0.5rem; }
+  .intro-title em { font-style: italic; color: var(--accent); }
+  .intro-sub { font-size: 14px; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.8; }
+  .btn-start { background: var(--accent); color: white; border: none; border-radius: 99px; padding: 16px 44px; font-family: 'Jost', sans-serif; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+  .btn-start:hover { background: var(--accent-dark); transform: translateY(-2px); }
+  .levels-wrap { width: 100%; max-width: 460px; }
+  .levels-title { text-align: center; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: white; margin-bottom: 1.5rem; }
+  .level-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem 1.4rem; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; }
+  .level-item.locked { opacity: 0.4; cursor: not-allowed; }
+  .level-item.unlocked:hover { border-color: var(--accent); transform: translateX(4px); }
+  .level-item.completed { border-color: rgba(29,158,117,0.4); }
+  .level-num { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .level-num.unlocked { background: rgba(201,79,124,0.2); }
+  .level-num.locked { background: rgba(255,255,255,0.05); }
+  .level-num.completed { background: rgba(29,158,117,0.2); }
+  .level-info { flex: 1; }
+  .level-name { font-size: 15px; font-weight: 500; color: white; margin-bottom: 2px; }
+  .level-desc { font-size: 12px; color: var(--muted); }
+  .level-status { font-size: 12px; font-weight: 500; }
+  .level-status.done { color: #1D9E75; }
+  .level-status.open { color: var(--accent); }
+  .level-status.lock { color: var(--muted); }
+  .game-wrap { width: 100%; max-width: 500px; }
+  .game-header { text-align: center; margin-bottom: 1.5rem; }
+  .game-level-badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; font-weight: 500; padding: 4px 14px; border-radius: 99px; background: rgba(201,79,124,0.15); color: var(--accent); margin-bottom: 8px; text-transform: uppercase; }
+  .game-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; color: white; }
+  .progress-track { height: 2px; background: rgba(255,255,255,0.1); border-radius: 99px; margin-bottom: 1.5rem; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.5s ease; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card-label { font-size: 11px; letter-spacing: 0.1em; font-weight: 500; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .q-text { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; line-height: 1.4; color: white; }
+  .hint { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 6px; }
+  .open-area { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 15px; font-family: 'Cormorant Garamond', serif; color: white; resize: none; min-height: 80px; transition: border-color 0.15s; margin-top: 12px; }
+  .open-area:focus { outline: none; border-color: var(--accent); }
+  .open-area::placeholder { color: var(--muted); font-style: italic; }
+  .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .choice { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; text-align: left; cursor: pointer; font-size: 14px; color: var(--text); font-family: 'Jost', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 10px; }
+  .choice:hover { border-color: var(--accent); background: rgba(201,79,124,0.1); }
+  .choice.sel { border-color: var(--accent); background: rgba(201,79,124,0.15); color: white; }
+  .check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.15s; }
+  .choice.sel .check { background: var(--accent); border-color: var(--accent); }
+  .gage-card { background: var(--card-bg); border: 1px solid rgba(186,117,23,0.3); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+  .gage-num { font-size: 11px; letter-spacing: 0.1em; font-weight: 500; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .gage-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; line-height: 1.5; color: white; margin-bottom: 14px; }
+  .gage-btns { display: flex; gap: 10px; }
+  .gage-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid; font-family: 'Jost', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; background: transparent; font-weight: 500; }
+  .gage-btn.yes { color: #1D9E75; border-color: rgba(29,158,117,0.3); }
+  .gage-btn.yes.sel { background: rgba(29,158,117,0.15); border-color: #1D9E75; }
+  .gage-btn.no { color: #E24B4A; border-color: rgba(226,75,74,0.3); }
+  .gage-btn.no.sel { background: rgba(226,75,74,0.15); border-color: #E24B4A; }
+  .gage-comment { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; color: white; resize: none; min-height: 60px; margin-top: 10px; display: none; }
+  .gage-comment:focus { outline: none; border-color: var(--gold); }
+  .gage-comment::placeholder { color: var(--muted); }
+  .game-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .btn-next { background: var(--accent); color: white; border: none; border-radius: 99px; padding: 11px 28px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
+  .counter { font-size: 12px; color: var(--muted); }
+  .complete-wrap { text-align: center; max-width: 420px; }
+  .complete-icon { font-size: 52px; margin-bottom: 1rem; }
+  .complete-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: white; margin-bottom: 8px; }
+  .complete-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 2rem; }
+  .btn-continue { background: var(--accent); color: white; border: none; border-radius: 99px; padding: 14px 40px; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; }
+  .done-wrap { text-align: center; max-width: 460px; width: 100%; }
+  .done-icon { font-size: 52px; margin-bottom: 1.2rem; }
+  .done-title { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: white; margin-bottom: 10px; }
+  .done-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .copy-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; text-align: left; }
+  .copy-box-title { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .copy-text { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+  .btn-copy { width: 100%; margin-top: 14px; background: var(--accent); color: white; border: none; border-radius: 99px; padding: 13px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .btn-copy.copied { background: #1D9E75; }
+  .copy-hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div id="s-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="petal">🔥</div>
+    <h1 class="intro-title">Le Grand<br><em>Final</em></h1>
+    <p class="intro-sub">6 niveaux. Des questions uniques et intenses.<br>Des gages à accepter si tu oses... 😈</p>
+    <button class="btn-start" onclick="showScreen('s-levels')">Je suis prête 😈</button>
+  </div>
+</div>
+
+<div id="s-levels" class="screen">
+  <div class="levels-wrap">
+    <p class="levels-title">Choisis ton niveau 🔥</p>
+    <div id="levels-list"></div>
+  </div>
+</div>
+
+<div id="s-game" class="screen">
+  <div class="game-wrap">
+    <div class="game-header">
+      <span class="game-level-badge" id="game-badge"></span>
+      <p class="game-title" id="game-title"></p>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div id="q-area"></div>
+  </div>
+</div>
+
+<div id="s-complete" class="screen">
+  <div class="complete-wrap">
+    <div class="complete-icon" id="complete-icon">⭐</div>
+    <h2 class="complete-title" id="complete-title">Niveau terminé !</h2>
+    <p class="complete-sub" id="complete-sub"></p>
+    <button class="btn-continue" onclick="showScreen('s-levels')">Retour aux niveaux</button>
+  </div>
+</div>
+
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-icon">🏆</div>
+    <h2 class="done-title">Tu as tout accompli...</h2>
+    <p class="done-sub">Envoie tes réponses sur WhatsApp 😘</p>
+    <div class="copy-box">
+      <div class="copy-box-title">Mes réponses 🔥</div>
+      <div class="copy-text" id="copy-text"></div>
+    </div>
+    <button class="btn-copy" id="btn-copy" onclick="copyAnswers()">📋 Copier mes réponses</button>
+    <p class="copy-hint">Puis colle dans WhatsApp et envoie-lui 😘</p>
+  </div>
+</div>
+
+<script>
+const levels = [
+  {
+    id:1, emoji:"🌶️", name:"Niveau 1 — Chaud", desc:"2 questions pour commencer...", type:"questions",
+    questions:[
+      { type:"multi", text:"Les moments où je pense le plus à toi c'est...", hint:"Tu peux choisir plusieurs réponses", choices:["Le matin en me réveillant","Quand je suis seule le soir","Au boulot quand je te vois","La nuit avant de m'endormir"] },
+      { type:"ouverte", text:"Si tu devais me décrire en 3 mots qui ne parlent que de notre intimité, ce serait lesquels ?" }
+    ]
+  },
+  {
+    id:2, emoji:"🔥", name:"Niveau 2 — Très chaud", desc:"Ça commence à chauffer...", type:"questions",
+    questions:[
+      { type:"multi", text:"Ce qui me rend folle quand tu me touches c'est...", hint:"Tu peux tout cocher si tu veux", choices:["La façon dont tu prends ton temps","Quand tu es intense et passionné","Tes mains qui descendent lentement","Quand tu sais exactement où aller"] },
+      { type:"ouverte", text:"Décris-moi exactement comment tu veux qu'on se retrouve la prochaine fois... lieu, heure, tenue, tout." }
+    ]
+  },
+  {
+    id:3, emoji:"😈", name:"Niveau 3 — Brûlant", desc:"Seulement si tu oses...", type:"questions",
+    questions:[
+      { type:"ouverte", text:"La chose que tu n'as jamais osé me demander mais que tu mourais d'envie d'essayer avec moi..." },
+      { type:"multi", text:"Ce que tu aimerais qu'on essaie qu'on n'a jamais fait...", hint:"Plusieurs réponses possibles", choices:["Faire l'amour dans un endroit insolite","Un jeu de rôle précis","Me laisser attacher et faire ce que tu veux","Une nuit entière sans limite"] }
+    ]
+  },
+  {
+    id:4, emoji:"💋", name:"Niveau 4 — Confessions", desc:"Dis-moi tout...", type:"questions",
+    questions:[
+      { type:"ouverte", text:"Raconte-moi la dernière fois que tu as pensé à moi dans un moment très intime... en détail." },
+      { type:"multi", text:"Ce que tu préfères que je te fasse avec ma bouche c'est...", hint:"Sois honnête, tu peux tout cocher", choices:["M'embrasser dans le cou longuement","Descendre lentement sur ton corps","Te faire jouir avec ma langue","Te mordre légèrement partout"] }
+    ]
+  },
+  {
+    id:5, emoji:"🔐", name:"Niveau 5 — Interdits", desc:"Pour les plus courageuses...", type:"questions",
+    questions:[
+      { type:"ouverte", text:"Si tu pouvais me regarder dans les yeux et me dire la chose la plus coquine que tu penses de moi sans te retenir... ce serait quoi ?" },
+      { type:"multi", text:"La prochaine fois qu'on a du temps seuls j'aimerais qu'on...", hint:"Coche tout ce que tu veux vraiment", choices:["Prenne notre temps sans se presser","Soit intense et sans retenue dès le début","Essaie quelque chose qu'on n'a jamais fait","Qu'on ne s'arrête que quand on est épuisés"] }
+    ]
+  },
+  {
+    id:6, emoji:"👑", name:"Niveau 6 — Les Gages", desc:"8 missions à accepter ou refuser...", type:"gages",
+    gages:[
+      "Tu te laisses lécher et toucher partout pendant 10 minutes sans pouvoir bouger ni me toucher",
+      "Tu te laisses faire jouir uniquement avec mes doigts sans rien d'autre 😈",
+      "Tu me fais une fellation jusqu'à ce que je jouisse dans ta bouche 🫣",
+      "Tu acceptes de le faire dans l'anus 😏",
+      "Tu te laisses faire l'amour toi par dessus en me regardant dans les yeux jusqu'au bout",
+      "Tu acceptes de me faire un strip-tease sur une chanson que je choisis 💃",
+      "Tu acceptes de me chuchoter à l'oreille exactement ce que tu ressens pendant qu'on fait l'amour",
+      "Tu acceptes qu'on fasse l'amour avec un accessoire qu'on achète ensemble"
+    ]
+  }
+];
+
+let completedLevels=[], allAnswers={}, currentLevel=null, curQ=0, levelAnswers=[], gageSels={}, multiSels={};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='s-levels') renderLevels();
+}
+
+function renderLevels() {
+  const list=document.getElementById('levels-list');
+  list.innerHTML=levels.map(l=>{
+    const done=completedLevels.includes(l.id);
+    const prevDone=l.id===1||completedLevels.includes(l.id-1);
+    const locked=!prevDone&&!done;
+    const cls=done?'completed':locked?'locked':'unlocked';
+    const numCls=done?'completed':locked?'locked':'unlocked';
+    const statusText=done?'✅ Terminé':locked?'🔒 Verrouillé':'▶ Jouer';
+    const statusCls=done?'done':locked?'lock':'open';
+    return `<div class="level-item ${cls}" onclick="${locked?'':`startLevel(${l.id})`}">
+      <div class="level-num ${numCls}">${l.emoji}</div>
+      <div class="level-info"><p class="level-name">${l.name}</p><p class="level-desc">${l.desc}</p></div>
+      <span class="level-status ${statusCls}">${statusText}</span>
+    </div>`;
+  }).join('');
+  if(completedLevels.length===levels.length){
+    list.innerHTML+=`<div style="text-align:center;margin-top:1.5rem;"><button class="btn-start" onclick="showFinal()">Voir toutes mes réponses 🏆</button></div>`;
+  }
+}
+
+function startLevel(id) {
+  currentLevel=levels.find(l=>l.id===id);
+  curQ=0; levelAnswers=[]; gageSels={}; multiSels={};
+  document.getElementById('game-badge').textContent=currentLevel.name;
+  document.getElementById('game-title').textContent=currentLevel.desc;
+  showScreen('s-game');
+  if(currentLevel.type==='questions') renderQuestion();
+  else renderGages();
+}
+
+function renderQuestion() {
+  const qs=currentLevel.questions;
+  if(curQ>=qs.length){finishLevel();return;}
+  const q=qs[curQ], pct=(curQ/qs.length)*100;
+  document.getElementById('prog').style.width=pct+'%';
+  if(!multiSels[curQ]) multiSels[curQ]=[];
+
+  let reponseHtml='';
+  if(q.type==='multi'){
+    reponseHtml=`<p class="hint">${q.hint}</p><div class="choices">${q.choices.map((c,i)=>`<button class="choice" onclick="toggleMulti(${curQ},${i},this)"><span class="check"></span>${c}</button>`).join('')}</div>`;
+  } else {
+    reponseHtml=`<textarea class="open-area" id="oa" placeholder="Réponds sans retenue... 😈"></textarea>`;
+  }
+
+  document.getElementById('q-area').innerHTML=`
+    <div class="card">
+      <div class="card-label">Question ${curQ+1}</div>
+      <p class="q-text">${q.text}</p>
+      ${reponseHtml}
+    </div>
+    <div class="game-nav">
+      <span class="counter">${curQ+1} / ${qs.length}</span>
+      <button class="btn-next" id="btn-next" onclick="nextQ()">
+        ${curQ===qs.length-1?'Terminer ✨':'Suivant →'}
+      </button>
+    </div>`;
+}
+
+function toggleMulti(qIdx, i, btn) {
+  if(!multiSels[qIdx]) multiSels[qIdx]=[];
+  const idx=multiSels[qIdx].indexOf(i);
+  if(idx===-1){ multiSels[qIdx].push(i); btn.classList.add('sel'); btn.querySelector('.check').textContent='✓'; }
+  else { multiSels[qIdx].splice(idx,1); btn.classList.remove('sel'); btn.querySelector('.check').textContent=''; }
+}
+
+function nextQ() {
+  const q=currentLevel.questions[curQ];
+  let ans='';
+  if(q.type==='multi'){
+    const sel=multiSels[curQ]||[];
+    ans=sel.length>0?sel.map(i=>q.choices[i]).join(', '):'...';
+  } else {
+    ans=document.getElementById('oa')?.value.trim()||'...';
+  }
+  levelAnswers.push({q:q.text, a:ans});
+  curQ++; renderQuestion();
+}
+
+function renderGages() {
+  const gages=currentLevel.gages;
+  document.getElementById('prog').style.width='0%';
+  document.getElementById('q-area').innerHTML=gages.map((g,i)=>`
+    <div class="gage-card" id="gage-${i}">
+      <div class="gage-num">Mission ${i+1} / ${gages.length}</div>
+      <p class="gage-text">${g}</p>
+      <div class="gage-btns">
+        <button class="gage-btn yes" onclick="selGage(${i},'oui',this)">😈 J'accepte !</button>
+        <button class="gage-btn no" onclick="selGage(${i},'non',this)">❌ Trop peur</button>
+      </div>
+      <textarea class="gage-comment" id="gc-${i}" placeholder="Dis-moi pourquoi... 😏"></textarea>
+    </div>`).join('')+
+    `<div class="game-nav" style="margin-top:1rem;">
+      <span class="counter">Accepte ou refuse chaque mission</span>
+      <button class="btn-next" onclick="finishGages()">Terminer 🔥</button>
+    </div>`;
+}
+
+function selGage(i,val,btn) {
+  const card=document.getElementById(`gage-${i}`);
+  card.querySelectorAll('.gage-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); gageSels[i]=val;
+  const comment=document.getElementById(`gc-${i}`);
+  comment.style.display="block";
+}
+
+function finishGages() {
+  levelAnswers=currentLevel.gages.map((g,i)=>{
+    const rep=gageSels[i]||'Non répondu';
+    const comment=document.getElementById(`gc-${i}`)?.value.trim()||'';
+    return {q:g, a:rep==='oui'?'😈 Accepté !'+(comment?' — '+comment:''):'❌ Refusé'};
+  });
+  finishLevel();
+}
+
+function finishLevel() {
+  allAnswers[currentLevel.id]={level:currentLevel.name, answers:levelAnswers};
+  completedLevels.push(currentLevel.id);
+  document.getElementById('complete-icon').textContent=currentLevel.emoji;
+  document.getElementById('complete-title').textContent=currentLevel.name+' terminé !';
+  document.getElementById('complete-sub').textContent=currentLevel.id<6?'Bien joué 🔥 Le niveau suivant se débloque maintenant...':'Tu as tout terminé ! Envoie tes réponses 🏆';
+  showScreen('s-complete');
+}
+
+function showFinal() {
+  let lines='';
+  levels.forEach(l=>{
+    const data=allAnswers[l.id];
+    if(!data) return;
+    lines+=`\n${l.emoji} ${l.name.toUpperCase()}\n`;
+    data.answers.forEach((a,i)=>{lines+=`${i+1}. ${a.q}\n➜ ${a.a}\n\n`;});
+  });
+  document.getElementById('copy-text').textContent=`🔥 Mes réponses — Le Grand Final :\n${lines}😘`;
+  showScreen('s-done');
+}
+
+function copyAnswers() {
+  const text=document.getElementById('copy-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('btn-copy');
+    btn.textContent='✅ Copié ! Colle ça dans WhatsApp 😘';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copier mes réponses';btn.classList.remove('copied');},3000);
+  }).catch(()=>{
+    const range=document.createRange();
+    range.selectNode(document.getElementById('copy-text'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    const btn=document.getElementById('btn-copy');
+    btn.textContent='✅ Copié !';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copier mes réponses';btn.classList.remove('copied');},3000);
+  });
+}
+
+renderLevels();
+</script>
+</body>
+</html>
